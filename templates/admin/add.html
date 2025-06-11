@@ -1,0 +1,331 @@
+{% extends 'admin/main.html' %}  
+{% load static %}
+
+{% block title %}
+    {% if request.path == '/examAdmin/addsubmission' %}
+        Admin | Add submission
+    {% elif request.path == '/examAdmin/addcollection' %}
+        Admin | Add collection
+    {% elif request.path == '/examAdmin/addmarked' %}
+        Admin | Add Marked
+    {% endif %}
+{% endblock %}
+
+
+
+{% block content %}
+
+<p>
+    {% for message in messages %}
+    <div class="message-box {{ message.tags }}">
+        {{ message }}
+    </div>
+     {% endfor %}
+     <script>
+     setTimeout(function() {
+         document.querySelectorAll('.message-box').forEach(function(el) {
+             el.style.display = 'none';
+         });
+     }, 6000); // Hide after 3 seconds
+     </script>
+     <style>
+     .message-box {
+         padding: 10px;
+         margin: 10px 0;
+         border-radius: 5px;
+     }
+     
+     .success { background-color: lightgreen; color: black; }
+     .error { background-color: lightcoral; color: white; }
+     </style> 
+</p>
+    
+
+{% if request.path == '/examAdmin/addsubmission'  %}
+<div class="collection-form-container">
+    <div class="form-card">
+    <div class="modal-header">
+        <h2>New Examination Material Submission</h2>
+        <button class="close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+        <form  class="submission-form" method="POST" action="addsubmission" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{form2.as_p}}
+            <input type="hidden" name="academic_year" id="academic_year">
+            <input type="hidden" name="semester_number" id="semester_number">
+            <!-- <input type="text" name="semester_name" id="semester_name"> -->
+            <div class="form-group">
+            <label for="examtype">*Examination Type</label>
+            <select name="exam_type" required>
+                <option value="">Select Exam Type</option>
+                <option value="Quiz">Quiz</option>
+                <option value="Test-1">Test-1</option>
+                <option value="Test-2">Test-2</option>
+                <option value="UE">UE</option>
+            </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="invname">*Invigilators Name</label>
+                    <input type="text" id="invname" required name="inv_name" style="text-transform: capitalize;">
+                </div>
+                <div class="form-group">
+                    <label for="dept">*Deptartment</label>
+                    <input type="text" id="dept" required name="inv_dept" style="text-transform: uppercase;">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lecturename">*Course Lecturer Name</label>
+                    <input type="text" id="lecturename" required style="text-transform: capitalize;" name="lect_name">
+                </div>
+                <div class="form-group">
+                    <label for="coursename">*Course</label>
+                    <input type="text" id="coursename" required placeholder="eg. CS301 - Data Structures" name="course_name" style="text-transform: uppercase;">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="examDate">*Exam Date</label>
+                    <input type="date" id="examDate" required name="exam_date">
+                </div>
+                <div class="form-group">
+                    <label for="bookletCount">*Number of Booklets</label>
+                    <input type="number" id="bookletCount" min="1" required name="number_booklets">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="notes">Additional Notes</label>
+                <textarea id="notes" rows="3" name="additional_notes"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="fileUpload">Upload Files (Optional)</label>
+                <div class="file-upload">
+                    <input type="file" id="fileUpload" name="file">
+                    <label for="fileUpload" class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Choose files or drag & drop</span>
+                    </label>
+                </div>
+                <div id="fileList" class="file-list"></div>
+            </div>
+            <div class="form-actions">
+                <a href="submissions"><button type="button" class="btn-secondary" id="cancelBtn">Cancel</button></a>
+                <button type="submit" class="btn-primary" name="form2">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</div>
+
+
+
+{% elif request.path == '/examAdmin/addcollection'  %}
+
+
+
+
+
+
+<div class="collection-form-container">
+    <div class="form-card">
+        <div class="modal-header">
+            <h2>New Examination Material Collection</h2>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form class="collection-form" method="POST" action="addcollection" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="academic_year" id="academic_year">
+                <input type="hidden" name="semester_number" id="semester_number">
+                <div class="form-group">
+                    <label for="examtype">*Examination Type</label>
+                    <select name="exam_type" required>
+                        <option value="">Select Exam Type</option>
+                        <option value="Quiz">Quiz</option>
+                        <option value="Test-1">Test-1</option>
+                        <option value="Test-2">Test-2</option>
+                        <option value="UE">UE</option>
+                    </select>
+                    </div>
+                <div class="form-group">
+                    <label for="lectureName">*Lecturer Name</label>
+                    <input list="lectures" name="lect_name" placeholder="lecture name" required>
+                    <datalist id="lectures">
+                       
+                        {% for lecture in lectures %}
+                        <option value="{{ lecture.lect_name }}">{{ lecture.lect_name }}</option>
+                        {% endfor %}
+                    </datalist>
+                    
+                </div>
+                
+                <div class="form-group">
+                    <label for="bookletCount">*Number of Booklets</label>
+                    <input type="number" id="bookletCount" min="1" required name="number_booklets">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phoneNumber">*Phone Number</label>
+                    <input type="tel" id="phoneNumber" placeholder="Enter phone number" required name="phone">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lecturename">*Course Name</label>
+                        <input list="courses" name="course" placeholder="courses..." required>
+                            <datalist id="courses">
+                                {% for course in courses %}
+                                <option value="{{ course }}" {% if course == request.POST.course %}selected{% endif %}>{{ course }}</option>
+                                {% endfor %}
+                            </datalist>
+                        
+                    </div>
+                    <div class="form-group">
+                        <label for="coursename">*Department</label>
+                        <input list="dept" name="department" placeholder="Department..." required>
+                        <datalist id="dept">
+                            {% for department in departments %}
+                           <option value="{{ department }}" {% if department == request.POST.department %}selected{% endif %}>{{ department }}</option>
+                          {% endfor %}
+                        </datalist>
+                       
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="returnDate">*Expected Return Date</label>
+                    <input type="date" id="returnDate" required name="return_date">
+                </div>
+                
+                <div class="form-group">
+                    <label for="collectionNotes">Additional Notes</label>
+                    <textarea id="collectionNotes" rows="3" placeholder="Any additional information" name="addition"></textarea>
+                </div>
+                <div class="form-actions">
+                    <a href="collections"><button type="button" class="btn-secondary" id="cancelBtn">Cancel</button></a>
+                    <button type="submit" class="btn-primary">Submit</button>
+                </div>
+               
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+{% elif request.path == '/examAdmin/addmarked' %}
+
+
+
+
+
+<div class="collection-form-container">
+    <div class="form-card">
+        <div class="modal-header">
+            <h2>Record Marked Examination Material</h2>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form  class="return-form" method="POST" action="addmarked" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="return">
+
+                <input type="hidden" name="academic_year" id="academic_year">
+                <input type="hidden" name="semester_number" id="semester_number">
+
+                <div class="form-group">
+                    <label for="examtype">*Examination Type</label>
+                    <select name="exam_type" required>
+                        <option value="">Select Exam Type</option>
+                        <option value="Quiz">Quiz</option>
+                        <option value="Test-1">Test-1</option>
+                        <option value="Test-2">Test-2</option>
+                        <option value="UE">UE</option>
+                    </select>
+                    </div>
+
+                <div class="form-group">
+                    <label for="returnFor">*Lecture</label>
+                    <input list="lectures" name="lect_name" placeholder="lecture name" required>
+                    <datalist id="lectures">
+                       
+                        {% for lecture in lectures %}
+                        <option value="{{ lecture.lect_name }}">{{ lecture.lect_name }}</option>
+                        {% endfor %}
+                    </datalist>
+                    
+                </div>
+                <div class="form-group">
+                    <label for="returnCourse">*Course</label>
+                    <input list="courses" name="course" placeholder="courses..." required>
+                            <datalist id="courses">
+                                {% for course in courses %}
+                                <option value="{{ course.course }}">{{ course.course }}</option>
+                                {% endfor %}
+                            </datalist>
+                    
+                    
+                </div>
+                <div class="form-group">
+                    <label for="returnDepartment">*Department</label>
+                    <input list="dept" name="department" placeholder="Department..." required>
+                        <datalist id="dept">
+                            {% for department in departments %}
+                            <option value="{{department.department }}">{{ department.department }}</option>
+                            {% endfor %}
+                        </datalist>
+                    
+                </div>
+                
+                <div class="form-group">
+                    <label for="returnDate">Return Date</label>
+                    <input type="date" id="returnDate" required name="return_date">
+                </div>
+                
+                <div class="form-group">
+                    <label for="returnedBy">Returned By</label>
+                    <input type="text" id="returnedBy" required name="return_by">
+                </div>
+                
+                <div class="form-group">
+                    <label for="bookletCount">Number of Booklets Returned</label>
+                    <input type="number" id="bookletCount" min="1" required name="number_booklets">
+                </div>
+                
+                <div class="form-group">
+                    <label for="condition">Condition</label>
+                    <select id="condition" required name="condition">
+                        <option value="">Select Condition</option>
+                        <option value="excellent">Excellent</option>
+                        <option value="good">Good</option>
+                        <option value="fair">Fair</option>
+                        <option value="poor">Poor</option>
+                        <option value="damaged">Damaged</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="returnNotes">Notes</label>
+                    <textarea id="returnNotes" rows="3" name="addition"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="marked"><button type="button" class="btn-secondary" id="cancelBtn">Cancel</button></a>
+                    <button type="submit" class="btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="message" style="text-align: center; margin: 50% 50% 50% 50%;">
+        <h2>404! page not found</h2>
+    </div>
+
+    {% endif %}
+{% endblock %}

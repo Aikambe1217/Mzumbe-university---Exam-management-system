@@ -1,0 +1,181 @@
+{% extends 'admin/main.html' %}  
+{% load static %}
+
+{%block title %}
+Admin | Collections
+{% endblock %}
+
+
+{% block content %}
+<p>
+    {% for message in messages %}
+    <div class="message-box {{ message.tags }}">
+        {{ message }}
+    </div>
+     {% endfor %}
+     <script>
+     setTimeout(function() {
+         document.querySelectorAll('.message-box').forEach(function(el) {
+             el.style.display = 'none';
+         });
+     }, 6000); // Hide after 3 seconds
+     </script>
+     <style>
+     .message-box {
+         padding: 10px;
+         margin: 10px 0;
+         border-radius: 5px;
+     }
+     
+     .success { background-color: lightgreen; color: black; }
+     .error { background-color: lightcoral; color: white; }
+     </style> 
+</p>
+            <!-- Collections Content -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h1>Collections</h1>
+                    <a href="addcollection">
+                        <button class="btn-primary">
+                            <i class="fas fa-plus"></i> New collection
+                        </button>
+                        </a>
+                </div>
+
+              
+                    <form method="post" action="collections" class="filter-container">
+                        {% csrf_token %}
+                        
+                        <div class="filter-group">
+                            <label for="courseFilter">Course</label>
+                            <input list="courses" name="course" placeholder="courses..." required>
+                                <datalist id="courses">
+                                    {% for course in courses %}
+                                    <option value="{{ course }}" {% if course == request.POST.course %}selected{% endif %}>{{ course }}</option>
+                                    {% endfor %}
+                                </datalist>
+                        </div>
+                    
+                        <div class="filter-group">
+                            <label for="departmentFilter">Department</label>
+                            <input list="dept" name="department" placeholder="Department..." required>
+                            <datalist id="dept">
+                              {% for department in departments %}
+                               <option value="{{ department }}" {% if department == request.POST.department %}selected{% endif %}>{{ department }}</option>
+                              {% endfor %}
+                               </datalist>
+                         
+                        </div>
+                    
+                        <div class="filter-group">
+                            <label for="examTypeFilter">Exam Type</label>
+                            <select id="examTypeFilter" name="exam_type" required>
+                                <option value="">Exam type</option>
+                                <option value="Quiz" {% if request.POST.exam_type == 'quiz' %}selected{% endif %}>Quiz</option>
+                                <option value="Test 1" {% if request.POST.exam_type == 'test 1' %}selected{% endif %}>Test 1</option>
+                                <option value="Test 2" {% if request.POST.exam_type == 'test 2' %}selected{% endif %}>Test 2</option>
+                                <option value="UE" {% if request.POST.exam_type == 'UE' %}selected{% endif %}>UE</option>
+                            </select>
+                        </div>
+                    
+                        <div class="filter-group">
+                            <label for="yearFilter">Academic Year</label>
+                            <select id="yearFilter" name="year" required>
+                                <option value="">Academic year</option>
+                                {% for year in years %}
+                                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    
+                        <div class="filter-group">
+                            <label for="semesterFilter">Semester</label>
+                            <select id="semesterFilter" name="semester" required>
+                                <option value="">Semester</option>
+                                {% for semester in semesters %}
+                                <option value="{{ semester }}" {% if semester == selected_semester %}selected{% endif %}>{{ semester }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    
+                        <button class="filter-btn" type="submit">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+                    </form>
+                
+
+                    <div class="data-table-container">
+                        <table class="data-table" id="recordsTable">
+                        <thead>
+                            <tr>
+                                <th>Academic Year</th>
+                                <th>Semester</th>
+                                <th>Exam Type</th>
+                                <th>Course</th>
+                                <th>Lecturer</th>
+                                <th>Department</th>
+                                <th>Expected Date</th>
+                                <th>Booklets</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for all in allRecord %}
+                            <tr>
+                                <td>{{all.academic_year}}</td>
+                                <td>{{all.semester_number}}</td>
+                                <td>{{all.exam_type}}</td>
+                                <td>{{all.course}}</td>
+                                <td>{{all.lect_name}}</td>
+                                <td>{{all.department}}</td>
+                                <td>{{all.expect_return}}</td>
+                                <td>{{all.number_of_booklets}}</td>
+                                <td>
+                                    {% if all.is_returned %}
+                                                <div class="submission-status">
+                                                <span class="status-badge completed">Returned</span>
+                                                </div>
+                                                {% else %}
+                                                <div class="submission-status">
+                                                    <span class="status-badge pending">Pending Return</span>
+                                                </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    
+                                    
+                                    
+                                    <form method="post" action="{% url 'delete_collected_item' all.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit"  class="btn-icon" onclick="return confirm('Are you sure? Item will be deleted in marked record too!');"  title="Delete Item">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        
+                                    </form>
+                                </td>
+                               
+                                 {% empty %}
+                                    <td style="color: red; text-align: center;" colspan="9">
+                                        No Such Collected Records
+                                    </td>
+                            </tr>
+            
+                           
+                            {% endfor %}
+                            
+                           
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="paginationContainer"></div>
+            </div>
+  
+    
+
+    <!-- Modal for New Collection -->
+    
+
+    <script src="js/collections.js"></script>
+    {% endblock %}

@@ -1,0 +1,249 @@
+{% extends 'main.html' %}  
+{% load static %}
+
+
+{% block title %}
+System Admin | Dashboard
+{% endblock %}
+
+{% block active_dashboard %} active {% endblock %}
+
+{% block section %}
+Dashboard
+{% endblock %}
+
+{%block content %}
+
+      <!-- Main Content Area -->
+
+
+      
+
+          <div class="content-wrapper">
+              <div class="dashboard-overview">
+                  <div class="stats-container">
+                      <div class="stat-card">
+                        
+                          <div class="stat-icon">
+                            
+                              <i class="fas fa-file-alt"></i>
+                          </div>
+                          <div class="stat-details">
+                            <h5>Total submitted </h5>
+                              <h3>{{total_rows}}</h3>
+                              <p>Total <b>{{total_submission}}</b> Booklets</p>
+                          </div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-icon">
+                              <i class="fas fa-hand-holding"></i>
+                          </div>
+                          <div class="stat-details">
+                            <h5>Total collected </h5>
+                              <h3>{{total_rows_collected}}</h3>
+                              <p>Total <b>{{total_collection}}</b> Booklets</p>
+                          </div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-icon">
+                              <i class="fas fa-check-circle"></i>
+                          </div>
+                           <div class="stat-details">
+                            <h5>Total Returned </h5>
+                              <h3>{{total_rows_returned}}</h3>
+                              <p>Total <b>{{total_return}}</b> Booklets</p>
+                          </div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-icon">
+                              <i class="fas fa-clock"></i>
+                          </div>
+                          <div class="stat-details">
+                             <h5>Total Pending </h5>
+                              <h3>{{total_pending_rows}}</h3>
+                              <p>Not Returned <b>{{pendingBooks}}</b> Booklets</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="recent-activity">
+                    <div class="section-header">
+                        <h3>Recent Activity</h3>
+                        <!-- <a href="#" class="view-all" id="viewAllButton">View All</a> -->
+                    </div>
+                    <div class="activity-list">
+                        <a href="submission">
+                        <div class="activity-item" style="cursor: pointer;">
+                            <div class="activity-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="activity-details">
+                                <p><strong>{{recent_submission.inv_name}}</strong> submitted {{recent_submission.number_of_booklets}} exam papers for <strong>{{recent_submission.course}}</strong></p>
+                                <p>
+                                <span class="activity-time">To lecturer : <strong>{{recent_submission.lect_name}}</strong>, Department <strong>{{recent_submission.department}}</strong> <br></span>
+                                </p>
+                                <span class="activity-time">Date: {{recent_submission.exam_date}}</span>
+                            </div>
+                        </div>
+                        </a>
+
+
+                        <a href="collection">
+                        <div class="activity-item" style="cursor: pointer;">
+                            <div class="activity-icon">
+                                <i class="fas fa-hand-holding"></i>
+                            </div>
+                            <div class="activity-details">
+                                <p><strong>{{recent_collection.lect_name}}</strong> collected {{recent_collection.number_of_booklets}} Booklets for marking</p>
+                                <p><span class="activity-time">Department <strong>{{recent_collection.department}} </strong>, Course - <strong>{{recent_collection.course}}</strong></span></p>
+                                <span class="activity-time">Expected return: {{recent_collection.expect_return}}</span>
+                            </div>
+                        </div>
+                        </a>
+
+                        <a href="return_page">
+                        <div class="activity-item" style="cursor: pointer;">
+                            <div class="activity-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="activity-details">
+                                <p><strong>{{recent_return.lect_name}}</strong> returned {{recent_return.number_of_booklets}} Booklets after marking</p>
+                                <p><span class="activity-time">Department <strong>{{recent_return.department}} </strong>, Course - <strong>{{recent_return.course}}</strong></span></p>
+                                <span class="activity-time">Date return: {{recent_return.return_date}}</span>
+                            </div>
+                        </div>
+                        </a>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-details">
+                                <p>System Examination officer <strong>{{recent_users.username}}</strong>  was Registered to the system</p>
+                                <span class="activity-time">{{recent_users.date_joined}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                  <div class="popup-overlay" id="activityPopup">
+                    <div class="popup-content">
+                        <div class="popup-header">
+                            <h2>All Activity</h2>
+                            <button class="close-button" id="closePopup">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px">Action</th>
+                                    <th>Person</th>
+                                    <th>Action</th>
+                                    <th class="text-right">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="table-icon">
+                                            <i class="fas fa-file-upload"></i>
+                                        </div>
+                                    </td>
+                                    <td><strong>Dr. Johnson</strong></td>
+                                    <td>submitted exam papers for CS301</td>
+                                    <td class="text-right">2 hours ago</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-icon">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </td>
+                                    <td><strong>Prof. Smith</strong></td>
+                                    <td>completed grading for PHY201</td>
+                                    <td class="text-right">5 hours ago</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-icon">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </div>
+                                    </td>
+                                    <td><strong>Admin</strong></td>
+                                    <td>scheduled new exam for MTH101</td>
+                                    <td class="text-right">Yesterday</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-icon">
+                                            <i class="fas fa-user-plus"></i>
+                                        </div>
+                                    </td>
+                                    <td><strong>System</strong></td>
+                                    <td>added 3 new lecturers to the database</td>
+                                    <td class="text-right">2 days ago</td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+              
+                  <div class="quick-actions">
+                      <div class="section-header">
+                          <h3>Quick Actions</h3>
+                      </div>
+                      <div class="actions-grid">
+                          <a href="submission" class="action-card">
+                              <div class="action-icon">
+                                  <i class="fas fa-file-upload"></i>
+                              </div>
+                              <div class="action-details">
+                                  <h4>Submit Record</h4>
+                                  <p>Upload new exam records</p>
+                              </div>
+                          </a>
+                          <a href="collection" class="action-card">
+                              <div class="action-icon">
+                                  <i class="fas fa-folder-open"></i>
+                              </div>
+                              <div class="action-details">
+                                  <h4>Collect Record</h4>
+                                  <p>Process record collection</p>
+                              </div>
+                          </a>
+                          <a href="return_page" class="action-card">
+                              <div class="action-icon">
+                                  <i class="fas fa-undo"></i>
+                              </div>
+                              <div class="action-details">
+                                  <h4>Return Record</h4>
+                                  <p>Process record returns</p>
+                              </div>
+                          </a>
+                          <a href="report" class="action-card">
+                              <div class="action-icon">
+                                  <i class="fas fa-chart-bar"></i>
+                              </div>
+                              <div class="action-details">
+                                  <h4>Generate Report</h4>
+                                  <p>Create analytical reports</p>
+                              </div>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      
+  
+
+  <!-- Overlay for mobile view -->
+ 
+  <div id="overlay" class="overlay"></div>
+
+  <script src="{% static 'script.js' %}"></script>
+  <script src="{% static 'academicyear.js' %}"></script>
+
+{% endblock %}

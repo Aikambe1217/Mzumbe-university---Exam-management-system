@@ -1,0 +1,177 @@
+{% extends 'main.html' %}  
+{% load static %}
+
+{%block title %}
+System Admin | Collection
+{% endblock %}
+{% block section %}
+Collections
+{% endblock %}
+{%block content %}
+
+     
+        <!-- Main Content Area -->
+      
+           
+
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h2>Record Collection</h2>
+                    <p>
+                        {% for message in messages %}
+                        <div class="message-box {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                         {% endfor %}
+                         <script>
+                         setTimeout(function() {
+                             document.querySelectorAll('.message-box').forEach(function(el) {
+                                 el.style.display = 'none';
+                             });
+                         }, 6000); // Hide after 3 seconds
+                         </script>
+                         <style>
+                         .message-box {
+                             padding: 10px;
+                             margin: 10px 0;
+                             border-radius: 5px;
+                         }
+                         
+                         .success { background-color: lightgreen; color: black; }
+                         .error { background-color: lightcoral; color: white; }
+                         </style> 
+                    </p>
+                </div>
+
+                <div class="collection-container">
+                    <div class="collection-form-container">
+                        <div class="form-card">
+                            <div class="form-header">
+                                <h3>New Record Collection</h3>
+                            </div>
+                            <form class="collection-form" method="POST" action="collection" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="academic_year" id="academic_year">
+                                <input type="hidden" name="semester_number" id="semester_number">
+                                <div class="form-group">
+                                    <label for="examtype">*Examination Type</label>
+                                    <select name="exam_type" required>
+                                        <option value="">Select Exam Type</option>
+                                        <option value="Quiz">Quiz</option>
+                                        <option value="Test-1">Test-1</option>
+                                        <option value="Test-2">Test-2</option>
+                                        <option value="UE">UE</option>
+                                    </select>
+                                    </div>
+                                <div class="form-group">
+                                    <label for="lectureName">*Lecturer Name</label>
+                                    <input list="lectures" name="lect_name" placeholder="lecture name" required>
+                                    <datalist id="lectures">
+                                       
+                                        {% for lecture in lectures %}
+                                        <option value="{{ lecture.lect_name }}">{{ lecture.lect_name }}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                    
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bookletCount">*Number of Booklets</label>
+                                    <input type="number" id="bookletCount" min="1" required name="number_booklets">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="phoneNumber">*Phone Number</label>
+                                    <input type="tel" id="phoneNumber" placeholder="Enter phone number" required name="phone">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="lecturename">*Course Name</label>
+                                        <input list="courses" name="course" placeholder="courses..." required>
+                                            <datalist id="courses">
+                                                {% for course in courses %}
+                                                <option value="{{ course.course_name }}">{{ course.course_name }}</option>
+                                                {% endfor %}
+                                            </datalist>
+                                        
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="coursename">*Department</label>
+                                        <input list="dept" name="department" placeholder="Department..." required>
+                                        <datalist id="dept">
+                                            {% for department in departments %}
+                                            <option value="{{department.inv_dept }}">{{ department.inv_dept }}</option>
+                                            {% endfor %}
+                                        </datalist>
+                                       
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="returnDate">*Expected Return Date</label>
+                                    <input type="date" id="returnDate" required name="return_date">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="collectionNotes">Additional Notes</label>
+                                    <textarea id="collectionNotes" rows="3" placeholder="Any additional information" name="addition"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="reset" class="reset-btn">Reset</button>
+                                    <button type="submit" class="submit-btn">Record Collection</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-collections-container">
+                        <div class="section-header">
+                            <h3>Recent Collections</h3>
+                            <a href="/main/collection_records" class="view-all" >View All</a>
+                        </div>
+                        <div class="collections-list" id="recentCollections">
+                            {% for collects in collectsOrder %}
+                            <div class="collection-item">
+                                <div class="collection-details">
+                                    <h4>{{collects.lect_name}}</h4>
+                                    <p><i class="fas fa-book"></i> {{collects.number_of_booklets}} Booklets</p>
+                                    <p><i class="fas fa-user-graduate"></i>Exam Type {{ collects.exam_type}}</p>
+                                    <p><i class="fas fa-phone"></i> {{collects.phone}}</p>
+                                    <p><i class="fas fa-calendar-alt"></i> {{collects.expect_return}}</p>
+                                </div>
+                                {% if collects.is_returned %}
+                                <div class="collection-status">
+                                    <span class="status-badge completed">Returned</span>
+                                </div>
+                                
+                                {% else %}
+                                <div class="collection-status">
+                                    <span class="status-badge pending">Pending Return</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% empty %}
+                            <p style="color: red; text-align: center; margin-top: 200px;">No Collected Records</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                   
+
+
+                </div>
+            </div>
+        
+    
+
+    <!-- Overlay for mobile view -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Notification -->
+
+
+   
+  <script src="{% static 'script.js' %}"></script>
+
+
+  {% endblock %}

@@ -1,0 +1,328 @@
+
+{% extends 'admin/main.html' %}  
+{% load static %}
+
+{%block title %}
+Admin | Submissions
+{% endblock %}
+
+
+{% block content %}
+<p>
+    {% for message in messages %}
+    <div class="message-box {{ message.tags }}">
+        {{ message }}
+    </div>
+     {% endfor %}
+     <script>
+     setTimeout(function() {
+         document.querySelectorAll('.message-box').forEach(function(el) {
+             el.style.display = 'none';
+         });
+     }, 6000); // Hide after 3 seconds
+     </script>
+     <style>
+     .message-box {
+         padding: 10px;
+         margin: 10px 0;
+         border-radius: 5px;
+     }
+     
+     .success { background-color: lightgreen; color: black; }
+     .error { background-color: lightcoral; color: white; }
+     </style> 
+</p>
+            <!-- Submissions Content -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h1>Examination Material Submissions</h1>
+                    <a href="addsubmission">
+                    <button class="btn-primary">
+                        <i class="fas fa-plus"></i> New Submission
+                    </button>
+                    </a>
+                </div>
+
+                <form method="post" action="submissions" class="filter-container">
+                    {% csrf_token %}
+                    
+                    <div class="filter-group">
+                        <label for="courseFilter">Course</label>
+                        <input list="courses" name="course" placeholder="courses..." required>
+                            <datalist id="courses">
+                                {% for course in courses %}
+                                <option value="{{ course }}" {% if course == request.POST.course %}selected{% endif %}>{{ course }}</option>
+                                {% endfor %}
+                            </datalist>
+                        
+                    </div>
+                
+                    <div class="filter-group">
+                        <label for="departmentFilter">Department</label>
+                        <input list="dept" name="department" placeholder="Department..." required>
+                          <datalist id="dept">
+                            {% for department in departments %}
+                             <option value="{{ department }}" {% if department == request.POST.department %}selected{% endif %}>{{ department }}</option>
+                            {% endfor %}
+                             </datalist>
+                       
+                    </div>
+                
+                    <div class="filter-group">
+                        <label for="examTypeFilter">Exam Type</label>
+                        <select id="examTypeFilter" name="exam_type" required>
+                            <option value="">Exam type</option>
+                            <option value="Quiz" {% if request.POST.exam_type == 'quiz' %}selected{% endif %}>Quiz</option>
+                            <option value="Test 1" {% if request.POST.exam_type == 'test 1' %}selected{% endif %}>Test 1</option>
+                            <option value="Test 2" {% if request.POST.exam_type == 'test 2' %}selected{% endif %}>Test 2</option>
+                            <option value="UE" {% if request.POST.exam_type == 'UE' %}selected{% endif %}>UE</option>
+                        </select>
+                    </div>
+                
+                    <div class="filter-group">
+                        <label for="yearFilter">Academic Year</label>
+                        <select id="yearFilter" name="year" required>
+                            <option value="">Academic year</option>
+                            {% for year in years %}
+                            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                
+                    <div class="filter-group">
+                        <label for="semesterFilter">Semester</label>
+                        <select id="semesterFilter" name="semester" required>
+                            <option value="">Semester</option>
+                            {% for semester in semesters %}
+                            <option value="{{ semester }}" {% if semester == selected_semester %}selected{% endif %}>{{ semester }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                
+                    <button class="filter-btn" type="submit" name="form1">
+                        <i class="fas fa-filter"></i> Apply Filter
+                    </button>
+                </form>
+
+                <div class="data-table-container">
+                    <table class="data-table" id="recordsTable">
+                        <thead>
+                            <tr>
+                                <th>Academic Year</th>
+                                <th>Semester</th>
+                                <th>Exam Type</th>
+                                <th>Course</th>
+                                <th>Lecturer</th>
+                                <th>Department</th>
+                                <th>Submission Date</th>
+                                <th>Booklets</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for all in allRecord %}
+                            <tr>
+                                <td>{{all.academic_year}}</td>
+                                <td>{{all.semester_number}}</td>
+                                <td>{{all.exam_type}}</td>
+                                <td>{{all.course}}</td>
+                                <td>{{all.lect_name}}</td>
+                                <td>{{all.department}}</td>
+                                <td>{{all.exam_date}}</td>
+                                <td>{{all.number_of_booklets}}</td>
+                                <td>
+                                    {% if all.is_collected %}
+                                                <div class="submission-status">
+                                                <span class="status-badge completed">Collected For Marking</span>
+                                                </div>
+                                                {% else %}
+                                                <div class="submission-status">
+                                                    <span class="status-badge pending">Not Collected for Marking</span>
+                                                </div>
+                                    {% endif %}
+                                </td>
+                                
+                                <td class="actions">
+                                    <!-- <button class="btn-icon" title="View Details"><i class="fas fa-eye"></i></button> -->
+                                    <button class="view-btn edit-btn" title="View Details"
+                                        data-id="{{ all.id }}"
+                                        data-year="{{ all.academic_year }}"
+                                        data-semester="{{ all.semester_number }}"
+                                        data-exam_type="{{all.exam_type}}"
+                                        data-course="{{ all.course }}"
+                                        data-lecturer="{{ all.lect_name }}"
+                                        data-department="{{ all.department }}"
+                                        data-date="{{ all.exam_date|date:'Y-m-d'}}"
+                                        data-booklets="{{ all.number_of_booklets }}"
+                                    >
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    
+
+                                    <form method="post" action="{% url 'delete_submitted_item' all.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit"  class="btn-icon" onclick="return confirm('Are you sure? Item will be deleted on both collection, marked and submission Records!');"  title="Delete Item">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        
+                                    </form>
+                                    
+                                </td>
+
+                                 {% empty %}
+                                    <td style="color: red; text-align: center;" colspan="9">
+                                        No Such Submitted Records
+                                    </td>
+                            </tr>
+            
+                           
+                            {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                </div>
+            
+                <div class="pagination" id="paginationContainer"></div>
+            </div>
+        
+    
+
+    <!-- Modal for New Submission -->
+    <div class="popup-overlay" id="activityPopup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2>Edit Record</h2>
+                <button class="close-button" id="closePopup">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="submission-form" method="POST" action="edit_submission_record" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="academic_year" id="academic_year" value="{{ record.academic_year }}">
+                <input type="hidden" name="semester_number" id="semester_number" value="{{ record.semester_number }}">
+                <input type="hidden" name="record_id" value="{{ record.id }}" id="record_id">
+
+            
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>*Exam Type</label>
+                        
+                        <select name="exam_type" required id="examtype">
+                            <option value="{{ record.exam_type }}" selected>{{ record.exam_type }}</option>
+                            <option value="Quiz">Quiz</option>
+                            <option value="Test-1">Test-1</option>
+                            <option value="Test-2">Test-2</option>
+                            <option value="UE">UE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>*Department</label>
+
+
+                        <input list="dept" name="inv_dept" id="department"  value="{{ record.department }}" required>
+                        <datalist id="dept">
+                        {% for department in record %}
+                        <option value="{{ department }}" {% if department == request.POST.department %}selected{% endif %}>{{ department }}</option>
+                        {% endfor %}
+                        </datalist>
+
+                      
+
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>*Course Lecturer Name</label>
+                        <input type="text" name="lect_name" value="{{ record.lect_name }}" required id="lecturename">
+                    </div>
+                    <div class="form-group">
+                        <label>*Course</label>
+                        <!-- <input type="text" name="course_name"  required id="coursename"> -->
+
+                        <input list="courses" name="course_name" id="coursename" value="{{ record.course }}" required>
+                            <datalist id="courses">
+                                {% for course in record %}
+                                <option value="{{ course }}" {% if course == request.POST.course %}selected{% endif %}>{{ course }}</option>
+                                {% endfor %}
+                            </datalist>
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>*Exam Date</label>
+                        <input type="date" name="exam_date" value="{{ record.exam_date|date:'Y-m-d' }}" required id="examDate">
+                    </div>
+                    <div class="form-group">
+                        <label>*Number of Booklets</label>
+                        <input type="number" name="number_booklets" value="{{ record.number_of_booklets }}" required min="1" id="bookletCount">
+                    </div>
+                </div>
+            
+                <div class="form-group">
+                    <button type="submit" class="filter-btn">Edit Record</button>
+                </div>
+            </form>
+            
+                    
+                
+            
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editButtons = document.querySelectorAll('.edit-btn');
+        const popup = document.getElementById('activityPopup');
+        const closePopupBtn = document.getElementById('closePopup');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Parse and format the date inside the click event
+                const rawDate = this.dataset.date; // e.g. "2025-04-12" or "April 12, 2025"
+                const parsedDate = new Date(rawDate);
+
+                // Ensure the date is valid before proceeding
+                if (!isNaN(parsedDate)) {
+                    const yyyy = parsedDate.getFullYear();
+                    const mm = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                    const dd = String(parsedDate.getDate()).padStart(2, '0');
+                    const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+                    document.getElementById('examDate').value = formattedDate;
+                } else {
+                    console.error('Invalid date format:', rawDate);
+                }
+
+                // Fill the rest of the form
+                document.getElementById('record_id').value = this.dataset.id;
+                document.getElementById('academic_year').value = this.dataset.year;
+                document.getElementById('semester_number').value = this.dataset.semester;
+                document.getElementById('examtype').value = this.dataset.exam_type;
+                document.getElementById('coursename').value = this.dataset.course;
+                document.getElementById('lecturename').value = this.dataset.lecturer;
+                document.getElementById('department').value = this.dataset.department;
+                document.getElementById('bookletCount').value = this.dataset.booklets;
+
+                // Show the popup
+                popup.style.display = 'flex';
+            });
+        });
+
+        // Close popup
+        closePopupBtn.addEventListener('click', function () {
+            popup.style.display = 'none';
+        });
+    });
+
+
+
+
+    
+</script>
+ 
+
+    <script src="js/submissions.js"></script>
+    {% endblock %}

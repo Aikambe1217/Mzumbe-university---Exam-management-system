@@ -1,0 +1,217 @@
+{% extends 'admin/main.html' %}  
+{% load static %}
+
+{%block title %}
+Admin | Dashboard
+{% endblock %}
+
+
+{% block content %}
+<p>
+    {% for message in messages %}
+    <div class="message-box {{ message.tags }}">
+        {{ message }}
+    </div>
+     {% endfor %}
+     <script>
+     setTimeout(function() {
+         document.querySelectorAll('.message-box').forEach(function(el) {
+             el.style.display = 'none';
+         });
+     }, 6000); // Hide after 3 seconds
+     </script>
+     <style>
+     .message-box {
+         padding: 10px;
+         margin: 10px 0;
+         border-radius: 5px;
+     }
+     
+     .success { background-color: lightgreen; color: black; }
+     .error { background-color: lightcoral; color: white; }
+     </style> 
+</p>
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <h1>Dashboard</h1>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total submitted </h3>
+                              <h1>{{total_rows}}</h1>
+                              <p>Total <b>{{total_submission}}</b> Booklets</p>
+                           
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-file-download"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total collected </h3>
+                              <h1>{{total_rows_collected}}</h1>
+                              <p>Total <b>{{total_collection}}</b> Booklets</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Returned </h3>
+                              <h1>{{total_rows_returned}}</h1>
+                              <p>Total <b>{{total_return}}</b> Booklets</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                             <h3>Total Pending </h3>
+                              <h1>{{total_pending_rows}}</h1>
+                              <p>Not Returned <b>{{pendingBooks}}</b> Booklets</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-row">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2>Recent Submissions</h2>
+                            <a href="/examAdmin/submissions" class="view-all">View All</a>
+                        </div>
+                        <div class="card-content">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Lecture</th>
+                                        <th>Exam Type</th>
+                                        <th>Booklets</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for submit in subs %}  
+                                    <tr>
+                                        <td>{{submit.course}}</td>
+                                        <td>{{submit.lect_name}}</td>
+                                        <td>{{submit.exam_type}}</td>
+                                        <td>{{submit.number_of_booklets}}</td>
+                                        
+                                         {% empty %}
+                                        <td>
+                                           
+                                            <p style="color: red; text-align: center; margin-top: 200px;">No Submitted Records</p>
+                                        </td>
+                                    </tr>
+                                   
+                                  {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2>Recent Collections</h2>
+                            <a href="/examAdmin/collections" class="view-all">View All</a>
+                        </div>
+                        <div class="card-content">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Lecturer</th>
+                                        <th>Exam Type</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for collects in collectsOrder %}
+                                    <tr>
+                                        <td>{{collects.course}}</td>
+                                        <td>{{collects.lect_name}}</td>
+                                        <td>{{collects.exam_type}}</td>
+                                        <td>
+                                            {% if collects.is_returned %}
+                                                <div class="collection-status">
+                                                    <span class="status-badge completed">Returned</span>
+                                                </div>
+                                                
+                                                {% else %}
+                                                <div class="collection-status">
+                                                    <span class="status-badge pending">Pending Return</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                       
+                                        {% empty %}
+                                        <td>
+                                           
+                                            <p style="color: red; text-align: center; margin-top: 200px;">No collected Records</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-row">
+                    <div class="dashboard-card full-width">
+                        <div class="card-header">
+                            <h2>Pending Returns</h2>
+                            <a href="/examAdmin/marked" class="view-all">View All</a>
+                        </div>
+                        <div class="data-table-container">
+                            <table class="data-table" id="recordsTable">
+                                <thead>
+                                    <tr>
+                                       
+                                        <th>Lecturer</th>
+                                        <th>Course/code</th>
+                                        <th>Exam Type</th>
+                                        <th>Booklets <i class="fas fa-book"></i></th>
+                                        <th>Department</th>
+                                        <th><i class="fas fa-calender"></i> Expected </th>
+                                        <th>Phone</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for pending in pendings %}
+                                    <tr>
+                                       
+                                        <td><strong>{{pending.lect_name}}</strong></td>
+                                        <td>{{pending.course}}</td>
+                                        <td>{{pending.exam_type}}</td>
+                                        <td>{{pending.number_of_booklets}}</td>
+                                        <td>{{pending.department}}</td>
+                                        <td>{{pending.expect_return}}</td>
+                                        <td>{{pending.phone}}</td>
+                                        
+                                        {% empty %}
+                                        <td>
+                                             <p style="color: red; text-align: center;">No Pending Records</p>
+                                        </td>
+                                        
+                                    </tr>
+                                    
+                                    {% endfor %}
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+    <script src="js/dashboard.js"></script>
+{% endblock %}

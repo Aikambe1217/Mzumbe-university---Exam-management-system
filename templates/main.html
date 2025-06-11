@@ -1,0 +1,357 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}  {% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+  <link rel="stylesheet" href="{% static 'styles2.css' %}">
+  <link rel="stylesheet" href="{% static 'popup.css' %}">
+  <link rel="stylesheet" href="{% static 'preloader.css' %}">
+  
+  {% if request.path == '/main/profile'  %}
+  <link rel="stylesheet" href="{% static 'profile.css' %}">
+  {% endif %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="{% static 'image/LOGO MZUMBE.png ' %}" rel="icon" type="image/jpeg">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{% static 'pagination.js' %}"></script>
+  <script src="{% static 'popup.js' %}"></script>
+
+</head>
+
+<body>
+    <!-- pre loader -->
+ 
+     <!-- Preloader - Only include if show_preloader is in session -->
+  {% if request.session.show_preloader %}
+  <div class="preloader" id="mzumbePreloader">
+    <div class="preloader-content">
+      <div class="logo-container">
+        <img src="{% static 'image/LOGO MZUMBE.png' %}" alt="Mzumbe University Logo" class="preloader-logo">
+        <div class="torch-glow"></div>
+      </div>
+      
+      <h2 class="preloader-title">WELCOME TO MZUMBE UNIVERSITY</h2>
+      <h3 class="preloader-subtitle">Examinations Records Management System</h3>
+      <h4 class="preloader-subtitle">{{user.username}}</h4>
+      
+      <div class="progress-container">
+        <div class="progress-bar" id="preloaderProgressBar"></div>
+      </div>
+      
+      <div class="loading-text">
+        <span id="preloaderPercentage">0%</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Include preloader script only when needed -->
+  <script src="{% static 'preloader.js' %}"></script>
+  {% endif %}
+
+    <!-- endpreloader -->
+  <div class="dashboard-container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar" id="sidebar">
+          <div class="sidebar-header">
+              <h2 class="university-name">MzumbeUniversity</h2>
+              <button id="close-sidebar" class="close-btn">
+                  <i class="fas fa-times"></i>
+              </button>
+          </div>
+          
+          <div class="sidebar-content">
+              <nav class="sidebar-menu">
+                  <ul>
+                    <li>
+                        <a href="/main/index" class="{% if '/main/index' in request.path %}active{% endif %}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/submission" class="{% if '/main/submission' in request.path %}active{% endif %}">
+                            <i class="fas fa-file-upload"></i>
+                            <span>Record Submission</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/collection" class="{% if '/main/collection' in request.path %}active{% endif %}">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Record Collection</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/return_page" class="{% if '/main/return_page' in request.path %}active{% endif %}">
+                            <i class="fas fa-undo"></i>
+                            <span>Record Return</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/report" class="{% if '/main/report' in request.path %}active{% endif %}">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/submission_records" class="{% if '/main/submission_records' in request.path %}active{% endif %}">
+                            <i class="fas fa-record-vinyl"></i>
+                            <span>Submission Records</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/collection_records" class="{% if '/main/collection_records' in request.path %}active{% endif %}">
+                            <i class="fas fa-record-vinyl"></i>
+                            <span>Collection Records</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/main/return_records" class="{% if '/main/return_records' in request.path %}active{% endif %}">
+                            <i class="fas fa-record-vinyl"></i>
+                            <span>Return Records</span>
+                        </a>
+                    </li>
+                    
+                      
+                              
+                      <li>
+                        <a href="#" >
+                            <i class="fas fa-calendar"></i>
+                            <span id="academicYear"></span>
+                        </a>
+                      </li>
+
+                      <li>
+                        <a href="#">
+                            <i class="fas fa-clock"></i>
+                            <span id="semester"></span>
+                        </a>
+                      </li>
+                                              
+                        </ul>                        <!-- <div class="date-info" id="dateInfo">Loading...</div> -->
+                                            
+                                            
+                                            
+                                    
+                      
+                  
+
+                  
+              </nav>
+              <a href="/main/profile">
+              <div class="user-info">
+                  <div class="user-avatar">
+                      <i class="fas fa-user-circle"></i>
+                  </div>
+                 
+                  <div class="user-details">
+                     {% if user.is_authenticated %}
+                      <h4 style="color: white; text-transform: uppercase;">{{user.username}}</h4> 
+                      {% endif %}
+                      <p>Admin</p>
+                  </div>
+                 
+              </div>
+              </a>
+              
+              <div class="sidebar-footer">
+                  <a href="/logout" id="logout-btn">
+                      <i class="fas fa-sign-out-alt"></i>
+                      <span>Logout</span>
+                  </a>
+              </div>
+          </div>
+      </aside>
+      
+      <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button id="toggle-sidebar" class="menu-toggle" type="button" aria-label="Toggle navigation menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">{% block section %} {% endblock %}</h1>
+            </div>
+            
+            <div class="header-right">
+              
+              {% if request.path == '/main/report'  %}
+              <form style="display: flex; gap: .5rem;" method="post" action="{% url 'report' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <select id="reportType" required name="year">
+                        <option value="">Select Academic year</option>
+                        {% for year in years %}
+                        <option value="{{ year.academic_year }}" {% if year.academic_year == selected_year %}selected{% endif %}>
+                            {{ year.academic_year }}
+                        </option>
+                        {% endfor %}
+                        
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <select id="reportType" required name="semester">
+                        <option value="">Select semester</option>
+                        {% for semester in semesters %}
+                        <option value="{{ semester.semester_number }}" {% if semester.semester_number == selected_semester %}selected{% endif %}>
+                            {{ semester.semester_number }}
+                        </option>
+                        {% endfor %}
+                        
+                    </select>
+                </div>
+               
+                <div class="form-group">
+                    <input type="submit" class="submit-btn" value="filter" style="background-color: #3498db; cursor: pointer;">
+                </div>
+            </form>
+            {% elif request.path == '/main/submission_records' or request.path == '/main/collection_records' or request.path == '/main/return_records'  %}
+            <div class="header-right">
+                
+                <div class="header-actions" >
+
+                    <button class="notification-btn" id="viewNotification">
+                        <i class="fas fa-bell"></i>
+                        <!-- <span class="badge">{{total_messages|default:0}}</span> -->
+                    </button>
+                    <button class="settings-btn">
+                        <i class="fas fa-cog"></i>
+                    </button>
+
+                    
+                </div>
+
+                    <div class="popup-overlay" id="notificationPopup">
+                        <div class="popup-content">
+                            <div class="popup-header">
+                                <h2>NOTIFICATION | PENDING RETURNS</h2>
+                                <button class="close-button" id="closenotification">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <table>
+                            <thead>
+                                <tr>
+                               
+                                    <th>Lecturer</th>
+                                    <th>Course/code</th>
+                                    <th>Exam Type</th>
+                                    <th>Booklets <i class="fas fa-book"></i></th>
+                                    <th>Department</th>
+                                    <th><i class="fas fa-calender"></i> Expected </th>
+                                    <th>Phone</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+    
+                                {% for pending in pendings %}
+                                <tr>
+                                   
+                                    <td><strong>{{pending.lect_name}}</strong></td>
+                                    <td>{{pending.course}}</td>
+                                    <td>{{pending.exam_type}}</td>
+                                    <td>{{pending.number_of_booklets}}</td>
+                                    <td>{{pending.department}}</td>
+                                    <td>{{pending.expect_return}}</td>
+                                    <td>{{pending.phone}}</td>
+                                    {% empty %}
+                                    <td>
+                                        <p style="color: red; text-align: center;">No due record to Notify</p>
+                                    </td>
+                                    
+                                </tr>
+                                
+                                
+                                {% endfor %}
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    
+
+                
+                
+            </div>
+            {% elif request.path == '/main/profile' %}
+            <div class="header-actions"></div>
+            
+            {% else %}
+                        <div class="header-actions">
+                           
+                            <a href="/main/profile">
+                                <button class="settings-btn" id="viewNotification">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                            </a>
+                           
+                        </div>
+
+                        
+
+
+              {% endif %}
+
+          </div>
+
+         
+            
+        </header>
+        
+      {%block content %}
+      
+      {% endblock %}
+      </main>
+
+    </div>
+
+    <script>
+         document.addEventListener("DOMContentLoaded", function () {
+                    const viewNotification = document.getElementById('viewNotification');
+                    const notificationPopup = document.getElementById('notificationPopup');
+                    const closenotification = document.getElementById('closenotification');
+                
+                    if (viewNotification && notificationPopup && closenotification) {
+                        viewNotification.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            notificationPopup.style.display = 'flex';
+                            document.body.style.overflow = 'hidden';
+                        });
+                
+                        closenotification.addEventListener('click', function () {
+                            notificationPopup.style.display = 'none';
+                            document.body.style.overflow = '';
+                        });
+                
+                        notificationPopup.addEventListener('click', function (e) {
+                            if (e.target === notificationPopup) {
+                                notificationPopup.style.display = 'none';
+                                document.body.style.overflow = '';
+                            }
+                        });
+                
+                        document.addEventListener('keydown', function (e) {
+                            if (e.key === 'Escape' && notificationPopup.style.display === 'flex') {
+                                notificationPopup.style.display = 'none';
+                                document.body.style.overflow = '';
+                            }
+                        });
+                    }
+                });
+    </script>
+                                  
+      <script src="{% static 'popup.js' %}"></script>
+      <script src="{% static 'pds.js' %}"></script>
+      <script src="{% static 'pagination.js' %}"></script>
+      <script src="{% static 'academicyear.js' %}"></script>
+      <script src="{% static 'profile.js' %}"></script>
+     
+
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+
+{% extends 'admin/main.html' %}  
+{% load static %}
+
+{%block title %}
+Admin | Settings
+{% endblock %}
+
+
+{% block content %}
+<p>
+    {% for message in messages %}
+    <div class="message-box {{ message.tags }}">
+        {{ message }}
+    </div>
+     {% endfor %}
+     <script>
+     setTimeout(function() {
+         document.querySelectorAll('.message-box').forEach(function(el) {
+             el.style.display = 'none';
+         });
+     }, 6000); // Hide after 3 seconds
+     </script>
+     <style>
+     .message-box {
+         padding: 10px;
+         margin: 10px 0;
+         border-radius: 5px;
+     }
+     
+     .success { background-color: lightgreen; color: black; }
+     .error { background-color: lightcoral; color: white; }
+     </style> 
+</p>
+            <!-- Settings Content -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h1>System Settings</h1>
+                </div>
+
+                <div class="settings-container">
+                    <div class="settings-sidebar">
+                        <ul class="settings-nav">
+                            <li class="active" data-tab="general">
+                                <i class="fas fa-cog"></i> General Settings
+                            </li>
+                            <li data-tab="notifications">
+                                <i class="fas fa-bell"></i> Notification Settings
+                            </li>
+                            <li data-tab="security">
+                                <i class="fas fa-shield-alt"></i> Security Settings
+                            </li>
+                            <li data-tab="backup">
+                                <i class="fas fa-database"></i> Backup & Restore
+                            </li>
+                            <li data-tab="system">
+                                <i class="fas fa-server"></i> System Information
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="settings-content">
+                        <!-- General Settings Tab -->
+                        <div class="settings-tab active" id="general">
+                            <h2>General Settings</h2>
+                            <form id="generalSettingsForm">
+                                
+                                <div class="form-group">
+                                    <label for="systemName">System Name</label>
+                                    <input type="text" id="systemName" name="systemName" value="{{ system_name }}">
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="universityName">University Name</label>
+                                    <input type="text" id="universityName" name="universityName" value="{{ university_name }}">
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="academicYear">Current Academic Year</label>
+                                    <input type="text" id="academicYear" name="academicYear" value="{{ academic_year }}">
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="semester">Current Semester</label>
+                                    <select id="semester" name="semester">
+                                        <option value="1" {% if semester == 1 %}selected{% endif %}>Semester 1</option>
+                                        <option value="2" {% if semester == 2 %}selected{% endif %}>Semester 2</option>
+                                    </select>
+                                    
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="defaultDueDate">Default Due Date (Days)</label>
+                                    <input type="number" id="defaultDueDate" name="defaultDueDate" value="{{ default_due_date }}">
+                                    <small>Number of days after collection for marking deadline</small>
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="timezone">Timezone</label>
+                                   
+
+                                    <select id="timezone" name="timezone">
+                                        {% for tz in timezones %}
+                                            <option value="{{ tz }}" {% if tz == timezone %}selected{% endif %}>{{ tz }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    
+                                    
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="dateFormat">Date Format</label>
+                                    <select id="dateFormat" name="dateFormat">
+                                        {% for fmt in date_formats %}
+                                            <option value="{{ fmt }}" {% if fmt == date_format %}selected{% endif %}>{{ fmt }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                            
+                        </div>
+
+                        <!-- Notification Settings Tab -->
+                        <div class="settings-tab" id="notifications">
+                            <h2>Notification Settings</h2>
+                            <form id="notificationSettingsForm">
+                                <div class="form-group">
+                                    <label>Email Notifications</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="emailNewSubmission" name="emailNewSubmission" checked>
+                                            <label for="emailNewSubmission">New Submission</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="emailNewCollection" name="emailNewCollection" checked>
+                                            <label for="emailNewCollection">New Collection</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="emailDueSoon" name="emailDueSoon" checked>
+                                            <label for="emailDueSoon">Due Soon Reminder</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="emailOverdue" name="emailOverdue" checked>
+                                            <label for="emailOverdue">Overdue Reminder</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>System Notifications</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="sysNewSubmission" name="sysNewSubmission" checked>
+                                            <label for="sysNewSubmission">New Submission</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="sysNewCollection" name="sysNewCollection" checked>
+                                            <label for="sysNewCollection">New Collection</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="sysDueSoon" name="sysDueSoon" checked>
+                                            <label for="sysDueSoon">Due Soon Reminder</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="sysOverdue" name="sysOverdue" checked>
+                                            <label for="sysOverdue">Overdue Reminder</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reminderDays">Reminder Days Before Due</label>
+                                    <input type="number" id="reminderDays" name="reminderDays" value="2">
+                                    <small>Number of days before due date to send reminder</small>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Security Settings Tab -->
+                        <div class="settings-tab" id="security">
+                            <h2>Security Settings</h2>
+                            <form id="securitySettingsForm">
+                                <div class="form-group">
+                                    <label for="passwordPolicy">Password Policy</label>
+                                    <select id="passwordPolicy" name="passwordPolicy">
+                                        <option value="low">Low (Minimum 6 characters)</option>
+                                        <option value="medium" selected>Medium (Minimum 8 characters, alphanumeric)</option>
+                                        <option value="high">High (Minimum 10 characters, alphanumeric with special characters)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sessionTimeout">Session Timeout (minutes)</label>
+                                    <input type="number" id="sessionTimeout" name="sessionTimeout" value="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="loginAttempts">Maximum Login Attempts</label>
+                                    <input type="number" id="loginAttempts" name="loginAttempts" value="5">
+                                </div>
+                                <div class="form-group">
+                                    <label>Two-Factor Authentication</label>
+                                    <div class="radio-group">
+                                        <div class="radio-item">
+                                            <input type="radio" id="twoFactorDisabled" name="twoFactor" value="disabled" checked>
+                                            <label for="twoFactorDisabled">Disabled</label>
+                                        </div>
+                                        <div class="radio-item">
+                                            <input type="radio" id="twoFactorOptional" name="twoFactor" value="optional">
+                                            <label for="twoFactorOptional">Optional</label>
+                                        </div>
+                                        <div class="radio-item">
+                                            <input type="radio" id="twoFactorRequired" name="twoFactor" value="required">
+                                            <label for="twoFactorRequired">Required for All Users</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Backup & Restore Tab -->
+                        <div class="settings-tab" id="backup">
+                            <h2>Backup & Restore</h2>
+                            <div class="backup-section">
+                                <h3>Database Backup</h3>
+                                <p>Create a backup of the system database. This includes all examination materials records, user data, and system settings.</p>
+                                <div class="form-actions">
+                                    <button type="button" class="btn-primary" id="backupNowBtn">
+                                        <i class="fas fa-download"></i> Backup Now
+                                    </button>
+                                    <!-- <form method="post" action="#">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-warning">Backup</button>
+                                    </form> -->
+                                </div>
+                                <div class="form-group">
+                                    <label for="autoBackup">Automatic Backup</label>
+                                    <select id="autoBackup" name="autoBackup">
+                                        <option value="disabled">Disabled</option>
+                                        <option value="daily" selected>Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="backupTime">Backup Time</label>
+                                    <input type="time" id="backupTime" name="backupTime" value="02:00">
+                                </div>
+                                <div class="form-group">
+                                    <label for="backupRetention">Backup Retention (days)</label>
+                                    <input type="number" id="backupRetention" name="backupRetention" value="30">
+                                </div>
+                            </div>
+                            <div class="restore-section">
+                                <h3>Restore Database</h3>
+                                <p>Restore the system from a previous backup. This will replace all current data with the data from the backup.</p>
+                                <div class="form-group">
+                                    <label for="backupFile">Select Backup File</label>
+                                    <input type="file" id="backupFile" name="backupFile">
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn-warning" id="restoreBtn">
+                                        <i class="fas fa-upload"></i> Restore
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Information Tab -->
+                        <div class="settings-tab" id="system">
+                            <h2>System Information</h2>
+                            <div class="system-info">
+                                <div class="info-group">
+                                    <h3>Software Information</h3>
+                                    <table class="info-table">
+                                        <tr>
+                                            <td>System Version:</td>
+                                            <td>1.0.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Last Updated:</td>
+                                            <td>none</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Django Version:</td>
+                                            <td>5.1.7</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Database:</td>
+                                            <td>POSTGRESQL </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="info-group">
+                                    <h3>System Statistics</h3>
+                                    <table class="info-table">
+                                        <tr>
+                                            <td>Total Users:</td>
+                                            <td>{{total_users}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Submissions:</td>
+                                            <td>{{total_submissions}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Collections:</td>
+                                            <td>{{total_collections}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Database Size:</td>
+                                            <td>{{ db_size }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="info-group">
+                                    <h3>System Maintenance</h3>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn-secondary" id="clearCacheBtn">
+                                            <i class="fas fa-broom"></i> Clear Cache
+                                        </button>
+                                        <button type="button" class="btn-secondary" id="optimizeDbBtn">
+                                            <i class="fas fa-database"></i> Optimize Database
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+    <script src="js/settings.js"></script>
+    {% endblock %}

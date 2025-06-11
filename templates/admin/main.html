@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}  {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles2.css' %}">
+    <link rel="stylesheet" href="{% static 'popup.css' %}">
+    <link rel="stylesheet" href="{% static 'preloader.css' %}">
+    <link href="{% static 'admin/LOGO MZUMBE.png ' %}" rel="icon" type="image/jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'pagination.js' %}"></script>
+    <script src="{% static 'popup.js' %}"></script>
+    {% if request.path == '/examAdmin/profile'  %}
+    <link rel="stylesheet" href="{% static 'profile.css' %}">
+    {% endif %}
+  
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="university-name">MzumbeUniversity</h2>
+                <button id="close-sidebar" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="{% if '/examAdmin/dashboard' in request.path %}active{% endif %}">
+                        <a href="/examAdmin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li class="{% if '/examAdmin/submissions' in request.path %}active{% endif %}">
+                        <a href="/examAdmin/submissions"><i class="fas fa-file-upload"></i> Submissions</a>
+                    </li>
+                    <li class="{% if '/examAdmin/collections' in request.path %}active{% endif %}">
+                        <a href="/examAdmin/collections"><i class="fas fa-file-download"></i> Collections</a>
+                    </li>
+                    <li class="{% if '/examAdmin/marked' in request.path %}active{% endif %}">
+                        <a href="/examAdmin/marked"><i class="fas fa-check-circle"></i> Marked Materials</a>
+                    </li>
+                    <li class="{% if '/examAdmin/reports' in request.path %}active{% endif %}">
+                        <a href="/examAdmin/reports"><i class="fas fa-chart-bar"></i> Reports</a>
+                    </li>
+                    <li class="{% if '/examAdmin/users' in request.path %}active{% endif %}">
+                        <a href="/examAdmin/users"><i class="fas fa-users"></i> Users</a>
+                    </li>
+                    <li class="{% if '/examAdmin/system_settings' in request.path %}active{% endif %}">
+                        <a href="/examAdmin/system_settings"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                </ul>
+                
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+                <div class="search-bar">
+                    <img src="{% static 'admin/LOGO MZUMBE.png' %}"  alt="university of mzumbe logo" class="user-avatar" title="MZUMBE UNIVERSITY">
+                    
+                </div>
+                <div class="user-menu">
+                    <div class="notifications">
+                        <div class="notifications">
+                            <a href="/main/index" style="color: blue; text-decoration: underline;" target="_blank">View Site?</a>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <i class="fas fa-user"> - </i>
+
+                        {% if user.is_authenticated %}
+                            <span class="user-name">   {{user.username}}, [system Administrator]</span> 
+                        {% endif %}
+                       
+                        <div class="dropdown-menu">
+                            <a href="/examAdmin/profile"><i class="fas fa-user"></i> Profile</a>
+                            <a href="/examAdmin/system_settings"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+        {% block content %}
+        <!-- startbody -->
+
+
+        <!-- endbody -->
+         {% endblock %}
+        </main>
+    </div>
+
+    <script src="{% static 'admin/js/dashboard.js' %}"></script>
+    <script src="{% static 'popup.js' %}"></script>
+    <script src="{% static 'pds.js' %}"></script>
+    <script src="{% static 'pagination.js' %}"></script>
+    <script src="{% static 'academicyear.js' %}"></script>
+    <script src="{% static 'profile.js' %}"></script>
+    <script src="{% static 'admin/users.js' %}"></script>
+    <script src="{% static 'admin/collections.js' %}"></script>
+    <script src="{% static 'admin/dashboard.js' %}"></script>
+    <script src="{% static 'admin/marked-materials.js' %}"></script>
+    <script src="{% static 'admin/profile.js' %}"></script>
+    <script src="{% static 'admin/reports.js' %}"></script>
+    <script src="{% static 'admin/settings.js' %}"></script>
+    <script src="{% static 'admin/submissions.js' %}"></script>
+   
+   
+</body>
+</html>

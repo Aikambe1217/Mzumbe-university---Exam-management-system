@@ -1,0 +1,100 @@
+{% extends 'main.html' %}  
+{% load static %}
+
+{%block title %}
+System Admin | Profile
+{% endblock %}
+{% block section %}
+PROFILE
+{% endblock %}
+
+
+
+{%block content %}
+
+<div class="container">
+    <p>
+        {% for message in messages %}
+        <div class="message-box {{ message.tags }}">
+            {{ message }}
+        </div>
+         {% endfor %}
+         <script>
+         setTimeout(function() {
+             document.querySelectorAll('.message-box').forEach(function(el) {
+                 el.style.display = 'none';
+             });
+         }, 6000); // Hide after 3 seconds
+         </script>
+         <style>
+         .message-box {
+             padding: 10px;
+             margin: 10px 0;
+             border-radius: 5px;
+         }
+         
+         .success { background-color: lightgreen; color: black; }
+         .error { background-color: lightcoral; color: white; }
+         </style> 
+    </p>
+
+    <!-- Main Content -->
+    <main>
+       
+
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="profile-info">
+                <div class="profile-pic">
+                    <img src="{% static 'image/LOGO MZUMBE.png' %}" alt="Profile Picture">
+                </div>
+                <div class="profile-details">
+                    <h2>{{user.username}}</h2>
+                    <p class="email">{{user.email}}</p>
+                </div>
+            </div>
+           
+        </div>
+
+        <!-- Form Section -->
+        <form class="form-section" method="post" action="profile">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fullName">First Name</label>
+                    <input type="text" id="fullName" name="firstname" placeholder="Your First Name" value="{{user.first_name}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="nickName">Last Name</label>
+                    <input type="text" id="lastName" name= "lastname" placeholder="Your Last Name" value="{{user.last_name}}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="user">User Name</label>
+                    <input type="text" id="lastName" name="username" placeholder="Your user Name" value="{{user.username}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="lastName" name="email" placeholder="Your Email" value="{{user.email}}" required>
+                </div>
+            </div>
+
+            
+
+            <!-- Email Section -->
+            <div class="email-section">
+                
+                <button class="add-email-btn" type="submit">Save Changes</button>
+            </div>
+        </form>
+    </main>
+</div>
+
+
+<script src="{% static 'script.js' %}"></script>
+<script src="{% static 'pagination.js' %}"></script>
+<script src="{% static 'popup.js' %}"></script>
+<script src="{% static 'profile.js' %}"></script>
+ {% endblock %}

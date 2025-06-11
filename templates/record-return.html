@@ -1,0 +1,260 @@
+{% extends 'main.html' %}  
+{% load static %}
+
+{%block title %}
+System Admin | Returns
+{% endblock %}
+{% block section %}
+Returns
+{% endblock %}
+{%block content %}
+
+     
+        <!-- Main Content Area -->
+        
+
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h2>Record Return</h2>
+                    <p>
+                        {% for message in messages %}
+                        <div class="message-box {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                         {% endfor %}
+                         <script>
+                         setTimeout(function() {
+                             document.querySelectorAll('.message-box').forEach(function(el) {
+                                 el.style.display = 'none';
+                             });
+                         }, 6000); // Hide after 3 seconds
+                         </script>
+                         <style>
+                         .message-box {
+                             padding: 10px;
+                             margin: 10px 0;
+                             border-radius: 5px;
+                         }
+                         
+                         .success { background-color: lightgreen; color: black; }
+                         .error { background-color: lightcoral; color: white; }
+                         </style> 
+                    </p>
+                </div>
+
+                <div class="return-container">
+                    <div class="return-form-container">
+                        <div class="form-card">
+                            <div class="form-header">
+                                <h3>Return Record</h3>
+                            </div>
+                            <form  class="return-form" method="POST" action="return_page" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="academic_year" id="academic_year">
+                                <input type="hidden" name="semester_number" id="semester_number">
+
+                                <div class="form-group">
+                                    <label for="examtype">*Examination Type</label>
+                                    <select name="exam_type" required>
+                                        <option value="">Select Exam Type</option>
+                                        <option value="Quiz">Quiz</option>
+                                        <option value="Test-1">Test-1</option>
+                                        <option value="Test-2">Test-2</option>
+                                        <option value="UE">UE</option>
+                                    </select>
+                                    </div>
+
+                                <div class="form-group">
+                                    <label for="returnFor">*Lecture</label>
+                                    <input list="lectures" name="lect_name" placeholder="lecture name" required>
+                                    <datalist id="lectures">
+                                       
+                                        {% for lecture in lectures %}
+                                        <option value="{{ lecture.lect_name }}">{{ lecture.lect_name }}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                    
+                                </div>
+                                <div class="form-group">
+                                    <label for="returnCourse">*Course</label>
+                                    <input list="courses" name="course" placeholder="courses..." required>
+                                            <datalist id="courses">
+                                                {% for course in courses %}
+                                                <option value="{{ course.course }}">{{ course.course }}</option>
+                                                {% endfor %}
+                                            </datalist>
+                                    
+                                    
+                                </div>
+                                <div class="form-group">
+                                    <label for="returnDepartment">*Department</label>
+                                    <input list="dept" name="department" placeholder="Department..." required>
+                                        <datalist id="dept">
+                                            {% for department in departments %}
+                                            <option value="{{department.department }}">{{ department.department }}</option>
+                                            {% endfor %}
+                                        </datalist>
+                                    
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="returnDate">Return Date</label>
+                                    <input type="date" id="returnDate" required name="return_date">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="returnedBy">Returned By</label>
+                                    <input type="text" id="returnedBy" required name="return_by">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bookletCount">Number of Booklets Returned</label>
+                                    <input type="number" id="bookletCount" min="1" required name="number_booklets">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="condition">Condition</label>
+                                    <select id="condition" required name="condition">
+                                        <option value="">Select Condition</option>
+                                        <option value="excellent">Excellent</option>
+                                        <option value="good">Good</option>
+                                        <option value="fair">Fair</option>
+                                        <option value="poor">Poor</option>
+                                        <option value="damaged">Damaged</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="returnNotes">Notes</label>
+                                    <textarea id="returnNotes" rows="3" name="addition" placeholder="
+                                    Example:
+                                    MARKING SCHEME: returned
+                                    OR
+                                    MARKING SCHEME: Not Returned
+                                    "></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="reset" class="reset-btn">Reset</button>
+                                    <button type="submit" class="submit-btn">Process Return</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-returns">
+                        <div class="section-header">
+                            <h3>Recent Returns</h3>
+                            <a href="/main/return_records" class="view-all">View All</a>
+                        </div>
+                        <div class="returns-list">
+
+                            {% for return in returnsOrder %}
+                            <div class="return-item">
+                                <div class="return-details">
+                                    <h4>Lecturer: {{return.lect_name}}</h4>
+                                    <p>Course: {{return.course}}</p>
+                                    <p class="return-meta">
+                                        <span><i class="fas fa-calendar"></i> Returned: {{return.return_date}}</span>
+                                    </p>
+                                    <p>
+                                        <span><i class="fas fa-book"></i> {{return.number_of_booklets}} Booklets</span>
+                                    </p>
+                                    <p>
+                                        <span><i class="fas fa-user-graduate"></i>Exam Type: {{return.exam_type}}</span>
+                                    </p>
+                                    <p class="return-meta">
+                                        <span>Department: {{return.department}}</span>
+                                    </p>
+                                </div>
+
+                                {% if return.condition == "excellent" %}
+                                <div class="return-status">
+                                    <span class="condition-badge excellent">Excellent</span>
+                                </div> 
+                                {% elif return.condition == "good" %}
+                                <div class="return-status">
+                                    <span class="condition-badge good">Good</span>
+                                </div>
+                                {% elif return.condition == "fair" %}
+                                <div class="return-status">
+                                    <span class="condition-badge fair">Fair</span>
+                                </div>
+                                {% elif return.condition == "poor" %}
+                                <div class="return-status">
+                                    <span class="condition-badge damaged">Poor</span>
+                                </div>
+                                {% else %}
+                                <div class="return-status">
+                                    <span class="condition-badge damaged">Damaged</span>
+                                </div>
+                                {% endif %}
+
+                            </div>
+                            {% empty %}
+                            <p style="color: red; text-align: center; margin-top: 200px;">No Returned Records</p>
+                            {% endfor %}
+
+                        
+                        </div>
+                    </div>
+
+                    
+                </div>
+            </div>
+       
+    
+
+    <!-- Return Confirmation Modal -->
+    <div id="returnConfirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Return</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-message">
+                    <i class="fas fa-question-circle"></i>
+                    <p>Are you sure you want to process this return?</p>
+                </div>
+                <div class="confirmation-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Record ID:</span>
+                        <span class="detail-value" id="confirmRecordId">REC-2023-002</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Course:</span>
+                        <span class="detail-value" id="confirmCourse">CS301 - Data Structures</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Booklets Returned:</span>
+                        <span class="detail-value" id="confirmBooklets">42</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Condition:</span>
+                        <span class="detail-value" id="confirmCondition">Good</span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="cancel-btn">Cancel</button>
+                    <button class="submit-btn" id="confirmReturnBtn">Confirm Return</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for mobile view -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <p id="notificationMessage">Record returned successfully!</p>
+        </div>
+    </div>
+
+   
+  <script src="{% static 'script.js' %}"></script>
+
+  {% endblock %}

@@ -1,0 +1,387 @@
+{% extends 'main.html' %}  
+{% load static %}
+
+{%block title %}
+System Admin | Reports
+{% endblock %}
+
+{%block content %}
+
+     
+        <!-- Main Content Area -->
+        
+                
+
+   
+
+              
+                   
+                    
+                    <div class="report-preview">
+                        <div class="report-card">
+                            <div class="report-header">
+                                <h3 id="reportTitle">General Report</h3>
+                                <div class="report-actions">
+                                    <button class="print-btn" title="Print Report"><i class="fas fa-print"></i></button>
+                                    <button class="download-btn" title="Download Report"><i class="fas fa-download"></i></button>
+                                    <button class="share-btn" title="Share Report"><i class="fas fa-share-alt"></i></button>
+                                </div>
+                            </div>
+                            <div class="report-content">
+                                <div class="report-summary">
+                                    <div class="summary-card">
+                                        <div class="summary-icon">
+                                            <i class="fas fa-file-upload"></i>
+                                        </div>
+                                        <div class="summary-details">
+                                           <h5>Total submitted </h5>
+                                            <h3>{{total_rows}}</h3>
+                                            <p>Total <b>{{total_submission}}</b> Booklets</p>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="summary-card">
+                                        <div class="summary-icon">
+                                            <i class="fas fa-folder-open"></i>
+                                        </div>
+                                        <div class="summary-details">
+                                            <h5>Total collected </h5>
+                                            <h3>{{total_rows_collected}}</h3>
+                                            <p>Total <b>{{total_collection}}</b> Booklets</p>
+                                           
+                                        </div>
+                                    </div>
+                                    <div class="summary-card">
+                                        <div class="summary-icon">
+                                            <i class="fas fa-undo"></i>
+                                        </div>
+                                        <div class="summary-details">
+                                            <h5>Total Returned </h5>
+                                            <h3>{{total_rows_returned}}</h3>
+                                            <p>Total <b>{{total_return}}</b> Booklets</p>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="summary-card">
+                                        <div class="summary-icon">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="summary-details">
+                                            <h5>Total Pending </h5>
+                                            <h3>{{total_pending_rows}}</h3>
+                                            <p>Not Returned <b>{{pendingBooks}}</b> Booklets</p>
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="report-charts">
+                                    <div class="chart-container">
+                                        <h4>General Report Summary</h4>
+                                        <canvas id="departmentChart"></canvas>
+                                    </div>
+
+                                    <style>
+                                        body {
+                                            font-family: Arial, sans-serif;
+                                            margin: 0;
+                                            padding: 20px;
+                                        }
+                                        .chart-container {
+                                            width: 100%;
+                                            margin: 0 auto;
+                                            padding: 20px;
+                                            border-radius: 8px;
+                                            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                                            background-color: white;
+                                            box-sizing: border-box;
+                                        }
+                                        h4 {
+                                            margin-top: 0;
+                                            margin-bottom: 15px;
+                                            font-size: 18px;
+                                            color: #333;
+                                        }
+                                        #departmentChart {
+                                            height: 250px !important; /* Reduced height */
+                                            width: 100% !important;
+                                        }
+                                    </style>
+                                
+                                    <script> 
+                                        const submitted = parseInt("{{ total_submission|default:0 }}");
+                                        const collected = parseInt("{{ total_collection|default:0 }}");
+                                        const returned = parseInt("{{ total_return|default:0 }}");
+                                        const pending = parseInt("{{ pendingBooks|default:0 }}");
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            // Get the canvas element
+                                            const ctx = document.getElementById('departmentChart').getContext('2d');
+                                           
+                                            
+                                            // Sample department data
+                                            const data = {
+                                                labels: ['Submition', 'Collection', 'Returns', 'Pending'],
+                                                datasets: [{
+                                                    label: 'General Report',
+                                                    data: [submitted, collected, returned, pending],
+                                                    fill: false,
+                                                    borderColor: 'rgb(75, 192, 192)',
+                                                    tension: 0.3,
+                                                    pointBackgroundColor: 'rgb(75, 192, 192)',
+                                                    pointBorderColor: '#fff',
+                                                    pointHoverBackgroundColor: '#fff',
+                                                    pointHoverBorderColor: 'rgb(75, 192, 192)',
+                                                    pointRadius: 5,
+                                                    pointHoverRadius: 7
+                                                }]
+                                            };
+                                
+                                            // Create the line chart
+                                            const departmentChart = new Chart(ctx, {
+                                                type: 'bar',
+                                                data: data,
+                                                options: {
+                                                    responsive: true,
+                                                    maintainAspectRatio: false, // Allow custom height
+                                                    plugins: {
+                                                        legend: {
+                                                            position: 'top',
+                                                            labels: {
+                                                                boxWidth: 12,
+                                                                padding: 10
+                                                            }
+                                                        },
+                                                        tooltip: {
+                                                            callbacks: {
+                                                                label: function(context) {
+                                                                    return `Performance: ${context.raw}%`;
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    scales: {
+                                                        y: {
+                                                            beginAtZero: true,
+                                                            max: 1000,
+                                                            ticks: {
+                                                                stepSize: 20
+                                                            },
+                                                            title: {
+                                                                display: true,
+                                                                text: 'countings (%)'
+                                                            }
+                                                        },
+                                                        x: {
+                                                            title: {
+                                                                display: true,
+                                                                text: 'Activity'
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    </script>
+                                    
+                                </div>
+                                
+                                <div class="report-table-container">
+                                    <h4>Detailed Analysis | <strong style="color: red;">PENDING RETURNS</strong></h4>
+                                    
+                                    <div class="table-container">
+                                    <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                       
+                                        <th>Lecturer</th>
+                                        <th>Course/code</th>
+                                        <th>Exam Type</th>
+                                        <th>Booklets <i class="fas fa-book"></i></th>
+                                        <th>Department</th>
+                                        <th><i class="fas fa-calender"></i> Expected </th>
+                                        <th>Phone</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for pending in pendings %}
+                                    <tr>
+                                       
+                                        <td><strong>{{pending.lect_name}}</strong></td>
+                                        <td>{{pending.course}}</td>
+                                        <td>{{pending.exam_type}}</td>
+                                        <td>{{pending.number_of_booklets}}</td>
+                                        <td>{{pending.department}}</td>
+                                        <td>{{pending.expect_return}}</td>
+                                        <td>{{pending.phone}}</td>
+                                        
+                                        {% empty %}
+                                        <td>
+                                             <p style="color: red; text-align: center;">No Pending Records</p>
+                                        </td>
+                                        
+                                    </tr>
+                                    
+                                    {% endfor %}
+                                    
+                                </tbody>
+                            </table>
+                            </div>
+
+                            <div class="report-table-container" style="display: none;">
+                                <h4>Detailed Analysis | <strong style="color: red;">Recent Submissions</strong></h4>
+                                
+                          <div class="table-container">
+                            <table class="custom-table">
+                            <thead>
+                                <tr>
+                                   
+                                    <th>For lecture</th>
+                                    <th>Department</th>
+                                    <th>Booklets <i class="fas fa-book"></i></th>
+                                    <th>Invigilator</th>
+                                    <th>Course</th>
+                                    <th>Addition</th>
+                                    <th>Files| any? </th>
+                                    
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                {% for pending in pendings %}
+                                <tr>
+                                   
+                                    <td><strong>{{pending.lect_name}}</strong></td>
+                                    <td>{{pending.course}}</td>
+                                    <td>{{pending.number_of_booklets}}</td>
+                                    <td>{{pending.department}}</td>
+                                    <td>{{pending.expect_return}}</td>
+                                    <td>{{pending.phone}}</td>
+                                    
+                                </tr>
+                                {% empty %}
+                                <p style="color: red; text-align: center;">No Pending Records</p>
+                                {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <div class="report-table-container" style="display: none;">
+                            <h4>Detailed Analysis | <strong style="color: red;">Recent Collection</strong></h4>
+                            
+                            <div class="table-container">
+                            <table class="custom-table">
+                        <thead>
+                            <tr>
+                               
+                                <th>Lecturer</th>
+                                <th>Course/code</th>
+                                <th>Exam Type</th>
+                                <th>Booklets <i class="fas fa-book"></i></th>
+                                <th>Department</th>
+                                <th><i class="fas fa-calender"></i> Expected </th>
+                                <th>Phone</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {% for pending in pendings %}
+                            <tr>
+                               
+                                <td><strong>{{pending.lect_name}}</strong></td>
+                                <td>{{pending.course}}</td>
+                                <td>{{pending.exam_type}}</td>
+                                <td>{{pending.number_of_booklets}}</td>
+                                <td>{{pending.department}}</td>
+                                <td>{{pending.expect_return}}</td>
+                                <td>{{pending.phone}}</td>
+                                {% empty %}
+                                <td>
+                                    <p style="color: red; text-align: center;">No Pending Records</p>
+                                </td>
+                               
+                                
+                            </tr>
+                           
+                            {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                    </div>
+
+                            <style>
+                                .table-container {
+                                    overflow-x: auto;
+                                    margin-top: 20px;
+                                    border: 1px solid #ccc;
+                                    border-radius: 6px;
+                                  }
+                                  
+                                  .custom-table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    min-width: 600px;
+                                  }
+                                  
+                                  .custom-table thead {
+                                    background-color: #f4f4f4;
+                                  }
+                                  
+                                  .custom-table th, .custom-table td {
+                                    padding: 12px 16px;
+                                    text-align: left;
+                                    border-bottom: 1px solid #ddd;
+                                    font-size: 14px;
+                                  }
+                                  
+                                  .custom-table tr:hover {
+                                    background-color: #f9f9f9;
+                                  }
+                                  
+                                  .status {
+                                    padding: 4px 8px;
+                                    border-radius: 4px;
+                                    font-weight: bold;
+                                  }
+                                  
+                                  .status.collected {
+                                    color: white;
+                                    background-color: green;
+                                  }
+                                  
+                                  .status.not-collected {
+                                    color: white;
+                                    background-color: orange;
+                                  }
+                                  
+                            </style>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+            </div>
+     
+            </div>
+
+   
+
+    <!-- Overlay for mobile view -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <p id="notificationMessage">Report generated successfully!</p>
+        </div>
+    </div>
+
+    <script src="{% static 'script.js' %}"></script>
+
+    {% endblock %}
